@@ -55,8 +55,8 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/MIC-DKFZ/nnUNet"
-repository = "https://github.com/MIC-DKFZ/nnUNet"
+homepage = "https://github.com/spinalcordtoolbox/nnUNet-neuropoly"
+repository = "https://github.com/spinalcordtoolbox/nnUNet-neuropoly"
 
 [project.scripts]
 nnUNetv2_plan_and_preprocess = "nnunetv2.experiment_planning.plan_and_preprocess_entrypoints:plan_and_preprocess_entry"
