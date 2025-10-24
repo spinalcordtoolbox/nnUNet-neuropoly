@@ -1,8 +1,8 @@
 [project]
-name = "nnunetv2"
+name = "nnunetv2-neuropoly"
 version = "2.6.2"
 requires-python = ">=3.10"
-description = "nnU-Net is a framework for out-of-the box image segmentation."
+description = "NeuroPoly fork of nnU-Net"
 readme = "readme.md"
 license = { file = "LICENSE" }
 authors = [
@@ -55,8 +55,8 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/MIC-DKFZ/nnUNet"
-repository = "https://github.com/MIC-DKFZ/nnUNet"
+homepage = "https://github.com/spinalcordtoolbox/nnUNet-neuropoly"
+repository = "https://github.com/spinalcordtoolbox/nnUNet-neuropoly"
 
 [project.scripts]
 nnUNetv2_plan_and_preprocess = "nnunetv2.experiment_planning.plan_and_preprocess_entrypoints:plan_and_preprocess_entry"
