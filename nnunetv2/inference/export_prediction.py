@@ -17,7 +17,8 @@ def convert_predicted_logits_to_segmentation_with_correct_shape(predicted_logits
                                                                 label_manager: LabelManager,
                                                                 properties_dict: dict,
                                                                 return_probabilities: bool = False,
-                                                                num_threads_torch: int = default_num_processes):
+                                                                num_threads_torch: int = default_num_processes,
+                                                                return_logits: bool = False):
     old_threads = torch.get_num_threads()
     torch.set_num_threads(num_threads_torch)
 
@@ -36,6 +37,10 @@ def convert_predicted_logits_to_segmentation_with_correct_shape(predicted_logits
     if not return_probabilities:
         # this has a faster computation path becasue we can skip the softmax in regular (not region based) trainig
         segmentation = label_manager.convert_logits_to_segmentation(predicted_logits)
+    if return_logits:
+        predicted_probabilities = predicted_logits
+        segmentation = label_manager.convert_logits_to_segmentation(predicted_logits)
+
     else:
         predicted_probabilities = label_manager.apply_inference_nonlin(predicted_logits)
         segmentation = label_manager.convert_probabilities_to_segmentation(predicted_probabilities)
@@ -53,14 +58,15 @@ def convert_predicted_logits_to_segmentation_with_correct_shape(predicted_logits
 
     # revert transpose
     segmentation_reverted_cropping = segmentation_reverted_cropping.transpose(plans_manager.transpose_backward)
-    if return_probabilities:
+    if return_probabilities or return_logits:
         # revert cropping
         predicted_probabilities = label_manager.revert_cropping_on_probabilities(predicted_probabilities,
                                                                                  properties_dict[
                                                                                      'bbox_used_for_cropping'],
                                                                                  properties_dict[
                                                                                      'shape_before_cropping'])
-        predicted_probabilities = predicted_probabilities.cpu().numpy()
+        if isinstance(predicted_probabilities, torch.Tensor):
+            predicted_probabilities = predicted_probabilities.cpu().numpy()
         # revert transpose
         predicted_probabilities = predicted_probabilities.transpose([0] + [i + 1 for i in
                                                                            plans_manager.transpose_backward])

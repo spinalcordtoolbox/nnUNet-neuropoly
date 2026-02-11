@@ -426,7 +426,8 @@ class nnUNetPredictor(object):
                                  segmentation_previous_stage: np.ndarray = None,
                                  output_file_truncated: str = None,
                                  save_or_return_probabilities: bool = False,
-                                 return_logits_per_fold: bool = False):
+                                 return_logits_per_fold: bool = False,
+                                 return_logits: bool = False):
         """
         WARNING: SLOW. ONLY USE THIS IF YOU CANNOT GIVE NNUNET MULTIPLE IMAGES AT ONCE FOR SOME REASON.
 
@@ -455,7 +456,6 @@ class nnUNetPredictor(object):
             predicted_logits = [ elem.cpu() for elem in self.predict_logits_from_preprocessed_data(dct['data'], return_logits_per_fold=return_logits_per_fold)]
         else:
             predicted_logits = self.predict_logits_from_preprocessed_data(dct['data'], return_logits_per_fold=return_logits_per_fold).cpu()
-
         if self.verbose:
             print('resampling to original shape')
         if output_file_truncated is not None:
@@ -473,6 +473,14 @@ class nnUNetPredictor(object):
                         dct['data_properties'],
                         return_probabilities=save_or_return_probabilities))
                     
+            if return_logits:
+                ret = convert_predicted_logits_to_segmentation_with_correct_shape(predicted_logits, self.plans_manager,
+                                                                                self.configuration_manager,
+                                                                                self.label_manager,
+                                                                                dct['data_properties'],
+                                                                                return_probabilities=
+                                                                                save_or_return_probabilities,
+                                                                                return_logits=return_logits)
                     
             else:
                 ret = convert_predicted_logits_to_segmentation_with_correct_shape(predicted_logits, self.plans_manager,
@@ -481,7 +489,7 @@ class nnUNetPredictor(object):
                                                                                 dct['data_properties'],
                                                                                 return_probabilities=
                                                                                 save_or_return_probabilities)
-            if save_or_return_probabilities:
+            if save_or_return_probabilities or return_logits:
                 if return_logits_per_fold:
                     segs, probs = zip(*ret)
                     ret = [list(segs), list(probs)]
